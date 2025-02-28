@@ -1,1 +1,73 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+# Data for OfBusiness Financials FY24
+years = np.array([2022, 2023, 2024]).reshape(-1, 1)
+operating_revenue = np.array([7140, 15343, 19296])
+total_expenses = np.array([6994, 15037, 18696])
+profit_loss = np.array([201, 463, 603])
+
+# Create and train the linear regression model for each financial metric
+model_revenue = LinearRegression().fit(years, operating_revenue)
+model_expenses = LinearRegression().fit(years, total_expenses)
+model_profit = LinearRegression().fit(years, profit_loss)
+
+# Predict the financial data for FY25
+year_2025 = np.array([2025]).reshape(-1, 1)
+predicted_revenue_2025 = model_revenue.predict(year_2025)[0]
+predicted_expenses_2025 = model_expenses.predict(year_2025)[0]
+predicted_profit_2025 = model_profit.predict(year_2025)[0]
+
+# Print the predicted values
+print(f"Predicted Operating Revenue for FY25: INR {predicted_revenue_2025:.2f} crore")
+print(f"Predicted Total Expenses for FY25: INR {predicted_expenses_2025:.2f} crore")
+print(f"Predicted Profit for FY25: INR {predicted_profit_2025:.2f} crore")
+
+# Plot the historical and predicted data
+years_extended = np.append(years, year_2025).reshape(-1, 1)
+operating_revenue_extended = np.append(operating_revenue, predicted_revenue_2025)
+total_expenses_extended = np.append(total_expenses, predicted_expenses_2025)
+profit_loss_extended = np.append(profit_loss, predicted_profit_2025)
+
+fig, ax = plt.subplots(figsize=(12, 8))
+
+bar_width = 0.25
+index = np.arange(len(years_extended))
+
+bar1 = ax.bar(index, operating_revenue_extended, bar_width, label='Operating Revenue (INR crore)', color='#1f77b4')
+bar2 = ax.bar(index + bar_width, total_expenses_extended, bar_width, label='Total Expenses (INR crore)', color='#ff7f0e')
+bar3 = ax.bar(index + 2 * bar_width, profit_loss_extended, bar_width, label='Profit (INR crore)', color='#2ca02c')
+
+# Highlight the FY25 bars with a distinct background color
+for bar in [bar1[-1], bar2[-1], bar3[-1]]:
+    bar.set_edgecolor('black')
+    bar.set_linewidth(2)
+    bar.set_hatch('//')
+
+ax.set_title('OfBusiness Financials FY25 Prediction', fontsize=20)
+ax.set_xlabel('Financial Year', fontsize=16)
+ax.set_ylabel('INR crore', fontsize=16)
+ax.set_xticks(index + bar_width)
+ax.set_xticklabels(['FY22', 'FY23', 'FY24', 'FY25\n(Prediction)'], fontsize=14)
+
+ax.legend(fontsize=14)
+ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+def add_labels(bars):
+    for bar in bars:
+        height = bar.get_height()
+        ax.annotate(f'{height:.2f}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),
+                    textcoords="offset points",
+                    ha='center', va='bottom', fontsize=12)
+
+add_labels(bar1)
+add_labels(bar2)
+add_labels(bar3)
+
+plt.tight_layout()
+plt.show()
+
 
